@@ -51,7 +51,7 @@ local function UnRecordUsedVisual(visual_uuid, character_uuid)
 end
 
 
-function AddVisual(visual_uuid, character_uuid)
+function ApplyVisual(visual_uuid, character_uuid)
     Utils.assertIsStr(visual_uuid, "Invalid visual UUID specified - Must be a valid UUID string")
     character_uuid = character_uuid or GetHostCharacter()
     Utils.assertIsStr(character_uuid, "Invalid character UUID specified - Must be a valid UUID string")
@@ -62,7 +62,8 @@ function AddVisual(visual_uuid, character_uuid)
 
     Osi.AddCustomVisualOverride(character_uuid, visual_uuid)
 end
-Main.AddVisual = AddVisual
+Main.AddVisual = ApplyVisual
+Main.ApplyVisual = ApplyVisual
 
 
 function RemoveVisual(visual_uuid, character_uuid)
@@ -87,3 +88,9 @@ function RemoveAllUsedVisualsForCharacter(character_uuid, unrecord)
         end
     end
 end
+Main.RemoveAllUsedVisualsForCharacter = RemoveAllUsedVisualsForCharacter
+
+-- TODO
+-- function ListVisualsForCharacter(character_uuid)
+--     local visuals = GetVisualsUsedForCharacter(character_uuid)
+-- end
