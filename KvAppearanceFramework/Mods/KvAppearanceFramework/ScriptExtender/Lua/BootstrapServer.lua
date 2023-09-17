@@ -11,6 +11,7 @@ Ext.Require("KvShared/_Main.lua")
 Main = {}
 State = {}
 VisualLibrary = {}
+Library = VisualLibrary -- Alias
 Addons = {}
 
 Ext.Require("KvAF_Main.lua")
@@ -18,6 +19,8 @@ Ext.Require("KvAF_Config.lua")
 Ext.Require("KvAF_State.lua")
 Ext.Require("KvAF_Library.lua")
 Ext.Require("KvAF_Addons.lua")
+Ext.Require("BaseGame_Pack/BG3-DAF_CCAV.lua")
+Ext.Require("BaseGame_Pack/BG3-DAF_CCSV.lua")
 
 
 local kvaf_initDone = false
