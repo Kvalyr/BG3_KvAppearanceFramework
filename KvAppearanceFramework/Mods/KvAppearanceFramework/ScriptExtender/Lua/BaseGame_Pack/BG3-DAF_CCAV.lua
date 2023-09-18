@@ -627,5 +627,7 @@ for k,v in pairs(baseGameOptions) do
     end
     local optionKey = string.format("%s_%s_%s%s", intendedRace, name_no_spaces, bodyType_char1, bodyShape_char1)
 
-    VisualLibrary.AddOptionWithCompatInfo(sourceAddonKey, categoryKey, optionKey, optionDesc, optionUUID, bodyType, bodyShape, intendedRace)
+    local deduplicate = true
+
+    VisualLibrary.AddOptionWithCompatInfo(sourceAddonKey, categoryKey, optionKey, optionDesc, optionUUID, bodyType, bodyShape, intendedRace, deduplicate)
 end
