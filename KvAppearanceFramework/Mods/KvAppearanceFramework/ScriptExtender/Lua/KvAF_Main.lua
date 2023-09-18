@@ -51,7 +51,8 @@ local function UnRecordUsedVisual(visual_uuid, character_uuid)
 end
 
 
-function ApplyVisual(visual_uuid, character_uuid)
+-- Mods.KvAppearanceFramework.ApplyVisual()
+function ApplyVisual(visual_uuid, character_uuid, ignoreIncompatibility)
     Utils.assertIsStr(visual_uuid, "Invalid visual UUID specified - Must be a valid UUID string")
     character_uuid = character_uuid or GetHostCharacter()
     Utils.assertIsStr(character_uuid, "Invalid character UUID specified - Must be a valid UUID string")
@@ -59,6 +60,15 @@ function ApplyVisual(visual_uuid, character_uuid)
     -- Keep a record of which UUIDs have been applied to a character at any time
     -- TODO: Move this to PersistentVars so that it's in-sync with the game state upon saving
     RecordUsedVisual(visual_uuid, character_uuid)
+
+    if not ignoreIncompatibility then
+        -- TODO: Check character's body type, body shape and race. Warn when applying incompatible visual
+        local isCompatible = true
+        local inCompatibilityReasons = {} -- TODO: bodyShape/bodyType/race
+        if not isCompatible then
+            _W(string.format("Applying Incompatible visual to character")) -- TODO: inCompatibilityReasons
+        end
+    end
 
     Osi.AddCustomVisualOverride(character_uuid, visual_uuid)
 end
