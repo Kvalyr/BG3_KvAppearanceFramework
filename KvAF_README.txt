@@ -38,6 +38,11 @@ Uninstallation:
 * This initial release should not be uninstalled from an active game. A future version will make it safer to uninstall.
 
 
+For mod developers:
+* As of v0.2, DAF has a rudimentary API. You can see its docstrings here: https://github.com/Kvalyr/BG3_KvAppearanceFramework/blob/main/KvAppearanceFramework/Mods/KvAppearanceFramework/ScriptExtender/Lua/API/v1.lua
+* To get an API client at runtime call `Mods.KvAppearanceFramework.API.GetClient("v1")`
+
+
 FAQ:
 
 Basics

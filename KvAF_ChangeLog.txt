@@ -1,3 +1,7 @@
 
+v0.2.0.0
+    * Added API (See here: https://github.com/Kvalyr/BG3_KvAppearanceFramework/blob/main/KvAppearanceFramework/Mods/KvAppearanceFramework/ScriptExtender/Lua/API/v1.lua )
+    * Used ScriptExtender v4 upgrades to populate the DAF library with almost all character creation parts
+
 v0.1.0.0
     * Initial release
