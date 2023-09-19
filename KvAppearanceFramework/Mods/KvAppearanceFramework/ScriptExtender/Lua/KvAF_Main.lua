@@ -50,6 +50,19 @@ local function UnRecordUsedVisual(visual_uuid, character_uuid)
     Config.SetValue(CONFIG_KEY_USED_VISUALS, usedVisuals_allCharacters)
 end
 
+-- ========
+function ApplyMaterialOverride(material_uuid, character_uuid)
+    -- TODO :)
+    -- material_uuid must be a `ScriptMaterialOverridePreset` - Can't be a generic material etc.
+end
+function RemoveMaterialOverride(material_uuid, character_uuid)
+    -- TODO :)
+end
+
+function RemoveAllUsedMaterialOverridesForCharacter(character_uuid, unrecord)
+    -- TODO :)
+end
+-- ========
 
 -- Mods.KvAppearanceFramework.ApplyVisual()
 function ApplyVisual(visual_uuid, character_uuid, ignoreIncompatibility)
@@ -69,6 +82,11 @@ function ApplyVisual(visual_uuid, character_uuid, ignoreIncompatibility)
             _W(string.format("Applying Incompatible visual to character")) -- TODO: inCompatibilityReasons
         end
     end
+
+    _I(string.format(
+        "Applying visual with UUID: '%s' - You can remove it again if desired by using the 'Remove' command with this UUID.",
+        visual_uuid
+    ))
 
     Osi.AddCustomVisualOverride(character_uuid, visual_uuid)
 end

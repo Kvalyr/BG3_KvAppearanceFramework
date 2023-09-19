@@ -14,6 +14,7 @@ VisualLibrary = {}
 Library = VisualLibrary -- Alias
 Addons = {}
 Constants = {}
+API = {}
 
 Ext.Require("KvAF_Main.lua")
 Ext.Require("KvAF_Constants.lua")
@@ -22,8 +23,9 @@ Ext.Require("KvAF_State.lua")
 Ext.Require("KvAF_Library.lua")
 Ext.Require("KvAF_Addons.lua")
 Ext.Require("KvAF_API.lua")
-Ext.Require("BaseGame_Pack/BG3-DAF_CCAV.lua")
--- Ext.Require("BaseGame_Pack/BG3-DAF_CCSV.lua") -- Disabled until we can infer the compat info
+Ext.Require("API/v1.lua")
+-- Ext.Require("BaseGame_Pack/BG3-DAF_CCAV.lua") -- Disabled until tested further so that we ensure consistent UUIDs across versions
+Ext.Require("BaseGame_Pack/BG3-DAF_CCSV.lua")
 
 
 local kvaf_initDone = false
