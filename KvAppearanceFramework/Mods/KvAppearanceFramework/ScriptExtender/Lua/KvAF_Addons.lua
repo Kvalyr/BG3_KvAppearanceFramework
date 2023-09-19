@@ -30,12 +30,12 @@ function Addons.List()
     _I("Registered Addons:")
     _I("============")
 
-    local padAmt = 25
+    local padAmt = 18
     for key, addonTable in Table.pairsByKeys(registeredAddons) do
         local addonkey = Utils.LeftPad( key, padAmt, " " )
         local addonName = Utils.LeftPad( addonTable.name, padAmt, " " )
         local addonAuthor = Utils.LeftPad( addonTable.author, padAmt, " " )
-        local addonDesc = Utils.LeftPad( addonTable.desc, padAmt, " " )
+        local addonDesc = Utils.LeftPad( addonTable.desc, 30, " " )
 
         _I(addonkey, ":", addonName, ":", addonAuthor, ":", addonDesc)
     end

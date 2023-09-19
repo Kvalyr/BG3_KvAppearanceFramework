@@ -27,7 +27,6 @@ optionTypes["HAIR"] = "Hair"
 optionTypes["HEAD"] = "Head"
 optionTypes["HEADWEAR"] = "Headwear"
 optionTypes["HORNS"] = "Horns"
-optionTypes["MODESTY_LEAF"] = "ModestyLeaf"
 optionTypes["PIERCING"] = "Piercing"
 optionTypes["UNASSIGNED"] = "Unassigned"
 optionTypes["UNDERWEAR"] = "Underwear"
@@ -35,6 +34,7 @@ optionTypes["UNDERWEAR"] = "Underwear"
 optionTypes["TAIL"] = "Tail"
 optionTypes["WINGS"] = "Wings"
 optionTypes["TEETH"] = "Teeth"
+optionTypes["MOUTH"] = "Mouth"
 
 optionTypes["INSTRUMENT"] = "Instrument"
 optionTypes["LIGHT"] = "Light"
@@ -44,7 +44,8 @@ optionTypes["OFFHAND"] = "Offhand"
 optionTypes["JEWELRY"] = "Jewellery"
 
 optionTypes["DYE"] = "Dye"
-optionTypes["PRIVATES"] = "Privates"
+optionTypes["MODESTY_LEAF"] = "ModestyLeaf"
+optionTypes["PRIVATE_PARTS"] = "Private Parts"
 
 -- ========
 -- Tags
@@ -104,9 +105,13 @@ function VisualLibrary.GetCategory( categoryKey )
     return optionCategories[categoryKey]
 end
 
--- BodyType
--- BodyShape
--- CompatibleRace
+function VisualLibrary.GetAllCategoryNames()
+    local ret = {}
+    for key in pairs(optionCategories) do
+        table.insert(ret, key)
+    end
+    return ret
+end
 
 function VisualLibrary.AddCompatibilityInfo( optionUUID, bodyType, bodyShape, intendedRace )
     local info = {}
@@ -120,30 +125,17 @@ function VisualLibrary.GetCompatibilityInfo( optionUUID )
     return compatInfos[optionUUID]
 end
 
-local function findNonDuplicateIndex(categoryTab, optionKey, int)
-    local tryInt = 0
-    local loopLimit = 100
-    local orig_optionKey = optionKey
-    while categoryTab[optionKey] do
-        if tryInt > loopLimit then
-            _W("Failed to find non-duplicate key within 100 tries")
-            break
-        end
-        optionKey = orig_optionKey.."_"..tostring(tryInt)
-        tryInt = tryInt + 1
-    end
-    return tostring(tryInt)
-end
-
-function VisualLibrary.AddOption( sourceAddonKey, categoryKey, optionKey, optionDesc, optionUUID, deduplicate ) -- , tags, compatibleRaces, compatibleBodies)
+function VisualLibrary.AddOption( sourceAddonKey, categoryKey, optionKey, optionDesc, optionUUID, noDeduplicate ) -- , tags, compatibleRaces, compatibleBodies)
     local categoryTab = VisualLibrary.GetCategory(categoryKey)
     Utils.assertIsStr(optionKey, "Invalid optionKey specified")
-    if not deduplicate then
+    if noDeduplicate then
         Utils.assert(not categoryTab[optionKey], string.format("Option '%s' already exists in category '%s'", optionKey, categoryKey))
     else
         if categoryTab[optionKey] then
-            local newKey = optionKey..findNonDuplicateIndex(categoryTab, optionkey)
-            _W(string.format("Duplicate entry at optionKey: %s - New key: %s", optionkey, newKey))
+            local currentTabSize = Table.Size(categoryTab)
+            local newKey = optionKey .. "_" .. tostring(currentTabSize)
+            _DBG(string.format("Duplicate entry at optionKey: %s - New key: %s", optionkey, newKey))
+            optionKey = newKey
         end
     end
     Utils.assertIsStr(optionUUID, "Invalid optionUUID specified")
@@ -160,14 +152,14 @@ function VisualLibrary.AddOption( sourceAddonKey, categoryKey, optionKey, option
     categoryTab[optionKey] = optionTable
 end
 
-function VisualLibrary.AddOptionWithCompatInfo( sourceAddonKey, categoryKey, optionKey, optionDesc, optionUUID, bodyType, bodyShape, intendedRace, deduplicate )
-    VisualLibrary.AddOption(sourceAddonKey, categoryKey, optionKey, optionDesc, optionUUID, deduplicate)
+function VisualLibrary.AddOptionWithCompatInfo(sourceAddonKey, categoryKey, optionKey, optionDesc, optionUUID, bodyType, bodyShape, intendedRace, noDeduplicate )
+    VisualLibrary.AddOption(sourceAddonKey, categoryKey, optionKey, optionDesc, optionUUID, noDeduplicate)
     VisualLibrary.AddCompatibilityInfo(optionUUID, bodyType, bodyShape, intendedRace)
 end
 
 -- Mods.KvAppearanceFramework.Library.ReportInfo()
 function VisualLibrary.ReportInfo()
-    local function rowConcat(arg1, arg2, arg3, agr4, arg5, arg6)
+    local function rowConcat( arg1, arg2, arg3, agr4, arg5, arg6 )
 
         local maxChars = 120 -- Default Script Extender window columns
 
@@ -184,9 +176,18 @@ function VisualLibrary.ReportInfo()
     _P("----------------------------------------------------------------------------------------------------------------")
     _P(rowConcat("[Category]", "[# of Options]"))
     _P("----------------------------------------------------------------------------------------------------------------")
-    for k,v in Table.pairsByKeys(optionCategories) do
+    for k, v in Table.pairsByKeys(optionCategories) do
         _P(rowConcat(k, Table.Size(v)))
     end
+end
+
+function VisualLibrary.GetAllOptionKeysForCategory( categoryKey )
+    local categoryTab = VisualLibrary.GetCategory(categoryKey)
+    local ret = {}
+    for key in Table.pairsByKeys(categoryTab) do
+        table.insert(ret, key)
+    end
+    return ret
 end
 
 -- Mods.KvAppearanceFramework.Library.ReportOptionsForCategory("Head")
@@ -197,24 +198,26 @@ function VisualLibrary.ReportOptionsForCategory( categoryKey, categoryTab )
     _P(string.format("Options in '%s' Category:", categoryKey))
     _P("============")
 
-    local function rowConcat(optionkey, bodyType, bodyShape, intendedRace, sourceAddon, optionDesc)
+    local function rowConcat( index, optionkey, bodyType, bodyShape, intendedRace, sourceAddon, optionDesc, optionUUID )
 
         local maxChars = 120 -- Default Script Extender window columns
 
         local tab = {
+            Utils.LeftPad(index, 4),
             Utils.LeftPad(optionkey, 36),
             Utils.LeftPad(bodyType, 8),
             Utils.LeftPad(bodyShape, 8),
             Utils.LeftPad(intendedRace, 19),
             Utils.LeftPad(sourceAddon, 14),
             Utils.LeftPad(optionDesc, 28),
+            Utils.LeftPad(optionUUID, 36),
         }
         return table.concat(tab)
     end
 
     local function printHeader()
         _P("----------------------------------------------------------------------------------------------------------------")
-        _P(rowConcat("[Option Key]", "[Type]", "[Shape]", "[Intended Race]", "[Source]", "[Description]"))
+        _P(rowConcat("#", "[Option Key]", "[Type]", "[Shape]", "[Intended Race]", "[Source]", "[Description]", "[UUID]"))
         _P("----------------------------------------------------------------------------------------------------------------")
     end
 
@@ -222,6 +225,7 @@ function VisualLibrary.ReportOptionsForCategory( categoryKey, categoryTab )
     local count = 0
     local prevRace = None
     for key, optionTable in Table.pairsByKeys(categoryTab) do
+        count = count + 1
         local sourceAddon = optionTable.sourceAddon
         local uuid = optionTable.uuid
         local desc = optionTable.desc
@@ -230,32 +234,49 @@ function VisualLibrary.ReportOptionsForCategory( categoryKey, categoryTab )
         local bodyShape = compatInfoTable.bodyShape or "Unknown"
         local intendedRace = compatInfoTable.intendedRace or "Unknown"
 
-        intendedRace = Constants.compat_equivalentRaces[intendedRace] or intendedRace
+        intendedRace = Constants.GetRaceCompatGroup(intendedRace) or intendedRace
 
         if prevRace and prevRace ~= intendedRace then
             printHeader()
         end
-        _P(rowConcat(key, bodyType, bodyShape, intendedRace, sourceAddon, desc))
+        _P(rowConcat(string.format("%03d", count), key, bodyType, bodyShape, intendedRace, sourceAddon, desc, uuid))
         prevRace = intendedRace
 
     end
     _P("========")
-    Ext.Utils.PrintWarning("Reminder: Applying options that don't match [Body Type] or [Body Shape] will usually result in misplaced parts or clipping.")
+    Ext.Utils.PrintWarning(
+        "Reminder: Applying options that don't match [Body Type] or [Body Shape] will usually result in misplaced parts or clipping."
+    )
     print("Applying options that don't match the [Intended Race] can sometimes result in misplaced parts or clipping.")
     _P("========")
 end
 
-function VisualLibrary.GetOptionFromCategory( categoryKey, optionKey, reportOptions )
+-- Mods.KvAppearanceFramework.Library.GetOptionByCategory("Hair", "Unknown_M__Shadowheart_Hair")
+function VisualLibrary.GetOptionByCategory( categoryKey, optionKey, reportOptions )
     local categoryTab = VisualLibrary.GetCategory(categoryKey)
     local optionTable = categoryTab[optionKey]
     if not optionTable then
-        _W("GetOptionFromCategory() Invalid option:", optionKey)
+        _W("GetOptionByCategory() Invalid option:", optionKey)
         if reportOptions then
             VisualLibrary.ReportOptionsForCategory(categoryKey, categoryTab)
         end
         return
     end
     return optionTable["uuid"]
+end
+
+function VisualLibrary.ApplyVisualByCategory( categoryKey, optionKey, ignoreIncompatibility )
+    local visual_uuid = VisualLibrary.GetOptionByCategory(categoryKey, optionKey, false)
+    if visual_uuid then
+        Main.ApplyVisual(visual_uuid, character_uuid, ignoreIncompatibility)
+    end
+end
+
+function VisualLibrary.RemoveVisualByCategory( categoryKey, optionKey )
+    local visual_uuid = VisualLibrary.GetOptionByCategory(categoryKey, optionKey, false)
+    if visual_uuid then
+        Main.RemoveVisual(visual_uuid, character_uuid)
+    end
 end
 
 -- ==================================================
