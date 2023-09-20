@@ -1,6 +1,9 @@
 local Constants = Constants
 local Output = KVS.Output
 
+Constants.NULL_CCSV = "68388a7c-3a0e-430b-9078-381d8ed1d660"
+
+
 local EQUIV_RACES_UNK = "Unknown"
 local EQUIV_RACES_ANY = "Any"
 local EQUIV_RACES_1 = "Hum/Elf/Tief/Gith"

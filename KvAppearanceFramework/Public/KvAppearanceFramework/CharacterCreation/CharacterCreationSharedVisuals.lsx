@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<save>
+    <version major="4" minor="0" revision="8" build="3"/>
+    <region id="CharacterCreationSharedVisuals">
+        <node id="root">
+            <children>
+
+                <!-- Null -->
+                <node id="CharacterCreationSharedVisual">
+                    <attribute id="DisplayName" type="TranslatedString" handle="h0715431fge95eg434dga34eg313e58a76bee" version="1"/>
+                    <attribute id="SlotName" type="FixedString" value="Unassigned"/>
+                    <attribute id="UUID" type="guid" value="68388a7c-3a0e-430b-9078-381d8ed1d660"/>
+                    <attribute id="VisualResource" type="guid" value="00000000-0000-0000-0000-000000000000"/>
+                </node>
+
+            </children>
+        </node>
+    </region>
+</save>
