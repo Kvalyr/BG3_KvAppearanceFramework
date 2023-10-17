@@ -3,10 +3,13 @@ local VisualLibrary = VisualLibrary
 local baseGameOptions = {}
 
 -- ==================================================
+local Output = KVS.Output
 local Static = KVS.Static
 local String = KVS.String
 local Utils = KVS.Utils
 local Constants = Constants
+-- ==================================================
+local API = API
 -- ==================================================
 
 -- ==================================================
@@ -120,11 +123,18 @@ hardcoded["e05b0f79-d3af-41eb-b0b2-1164b6f0debf"] = {
     Description = "Shar Wrath Hair",
 }
 
+local seenUUIDs = {}
+
 local function Init( CCSV_key, sourceAddonKey )
     -- local CCSV_key = "CharacterCreationSharedVisual"
     local CCSVData_uuids = Static.GetAllUUIDsForType(CCSV_key)
-    local CCSV_Names = {}
-    local CCSV_dicts = {}
+    -- local CCSV_Names = {}
+    -- local CCSV_dicts = {}
+
+    local APIClient = API.GetClient("v1", sourceAddonKey)
+
+    -- Output.DebugVerbose("BG3-DAF-CCSV", "Init")
+
     for _, ccsv_uuid in pairs(CCSVData_uuids) do
 
         if hardcoded[ccsv_uuid] then
@@ -132,9 +142,8 @@ local function Init( CCSV_key, sourceAddonKey )
 
         elseif ccsv_uuid ~= Constants.NULL_UUID then
 
-
             local ccsv_name = Static.GetNameForUUIDOfType(ccsv_uuid, CCSV_key, "DisplayName", false)
-            CCSV_Names[ccsv_uuid] = ccsv_name
+            -- CCSV_Names[ccsv_uuid] = ccsv_name
 
             local ccsv_data = Ext.StaticData.Get(ccsv_uuid, CCSV_key)
             local SlotName = ccsv_data["SlotName"]
@@ -188,6 +197,8 @@ local function Init( CCSV_key, sourceAddonKey )
         end
     end
 
+    local count = 0
+
     for k, v in pairs(baseGameOptions) do
         local optionUUID = k
         local categoryKey = v.SlotName
@@ -200,6 +211,8 @@ local function Init( CCSV_key, sourceAddonKey )
         local name_no_spaces = string.gsub(v.Name, "%s+", "_")
         local bodyType_char1 = String.GetFirstChar(bodyType)
         local bodyShape_char1 = String.GetFirstChar(bodyShape)
+
+        Output.DebugVerbose("BG3-DAF-CCSV", k, v)
 
         if bodyType_char1 == "N" or bodyType_char1 == "A" then
             bodyType_char1 = ""
@@ -219,21 +232,41 @@ local function Init( CCSV_key, sourceAddonKey )
 
         local optionKey = string.format("%s_%s%s", racePrefix, bodyStr, name_no_spaces)
 
-        VisualLibrary.AddOptionWithCompatInfo(
-            sourceAddonKey, categoryKey, optionKey, optionDesc, optionUUID, bodyType, bodyShape, compatibleRaces, false
+        APIClient.Library_AddOption(
+            categoryKey, optionKey, optionUUID, optionDesc, bodyType, bodyShape, compatibleRaces, false, sourceAddonKey
         )
+
+        table.insert(seenUUIDs, optionUUID)
+        count = count + 1
     end
+    return count
 end
 
 local function Init_CCSV()
-    Init("CharacterCreationSharedVisual", "BG3-DAF-CCSV")
+    local countAdded = Init("CharacterCreationSharedVisual", "BG3-DAF-CCSV")
+    Output.Debug("BG3-DAF-CCSV", "Init_CCSV", "Count:", countAdded)
+    Output.Debug("BG3-DAF-CCSV", "Init_CCSV", "seenUUIDs:", #seenUUIDs)
 end
 
 local function Init_CCAV()
-    Init("CharacterCreationAppearanceVisual", "BG3-DAF-CCAV")
+    local countAdded = Init("CharacterCreationAppearanceVisual", "BG3-DAF-CCAV")
+    Output.Debug("BG3-DAF-CCSV", "Init_CCAV", "Count:", countAdded)
+    Output.Debug("BG3-DAF-CCSV", "Init_CCAV", "seenUUIDs:", #seenUUIDs)
 end
 
 CCSV_Init = Init
 
+BG3_DAF_CCSV.Init_CCSV = Init_CCSV
+BG3_DAF_CCSV.Init_CCAV = Init_CCAV
+
 KVS.Events.Register_Osiris("LevelGameplayStarted", 2, "after", Init_CCSV)
 KVS.Events.Register_Osiris("LevelGameplayStarted", 2, "after", Init_CCAV)
+
+-- Mods.KvAppearanceFramework.VisualLibrary.ReportInfo()
+-- Mods.KvAppearanceFramework.VisualLibrary.ReportOptionsForCategory("Head")
+-- Mods.KvAppearanceFramework.VisualLibrary.ReportOptionsForCategory("Hair")
+-- Mods.KvAppearanceFramework.VisualLibrary.ReportOptionsForCategory("Horns")
+-- Mods.KvAppearanceFramework.VisualLibrary.ReportOptionsForCategory("Teeth")
+
+-- Mods.KvAppearanceFramework.BG3_DAF_CCSV.Init_CCSV()
+-- Mods.KvAppearanceFramework.BG3_DAF_CCSV.Init_CCAV()

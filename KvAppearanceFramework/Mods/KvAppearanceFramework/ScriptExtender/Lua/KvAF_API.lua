@@ -16,8 +16,8 @@ API.versions = {}
 -- ==================================================
 
 --- Get a client object for interacting with DAF
--- @param version : string : A string in the form of "N" or "vN" where N is the version number of the API required
--- @param callerAddon : string : A string identifying the mod/addon calling the API
+---@param version string A string in the form of "N" or "vN" where N is the version number of the API required
+---@param callerAddon string Identifier for the mod/addon calling the API
 function API.GetClient(version, callerAddon)
     version = tostring(version)
     if String.StartsWith(version, "v") then
